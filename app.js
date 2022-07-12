@@ -38,19 +38,16 @@ function nextAction() {
                     viewAllEmployees();
                     break;
                 case 'Add a department':
-                    let newDepartment = new Department();
-                    addDept(newDepartment);
+                    inquireDept();
                     break;
                 case 'Add a role':
-                    let newRole = new Role();
-                    addRole(newRole);
+                    inquireRole();
                     break;
                 case 'Add an employee':
-                    let newEmployee = new Employee();
-                    addEmployee(newEmployee);
+                    inquireEmployee();
                     break;
                 case 'Update an employee role':
-                    Employee.update();
+                    inquireUpdate();
                     break;
             }
         });
@@ -96,6 +93,124 @@ function viewAllEmployees() {
             console.log('\n');
             nextAction();
         })
+};
+
+function inquireDept() {
+    console.clear();
+    console.log("Let's add a new department to the database. Please answer the question bellow.");
+
+    inquirer.prompt([{
+        type: 'input',
+        name: 'deptName',
+        message: 'What is the name of this department?'
+    }
+    ]).then(({ deptName }) => {
+        let newDepartment = new Department(deptName);
+        console.log(newDepartment);
+
+        addDept(newDepartment);
+    })
+};
+
+function addDept(newDepartment) {
+    db.promise().query('INSERT INTO departments SET ?', newDepartment)
+    nextAction();
+};
+
+function inquireRole() {
+    console.clear();
+    console.log("Let's add a new role to the database. Please answer a few questions.");
+
+    inquirer.prompt([{
+        type: 'input',
+        name: 'title',
+        message: 'What is the title of this role?'
+    },
+    {
+        type: 'input',
+        name: 'salary',
+        message: 'What is the salary for this role?'
+    },
+    {
+        type: 'input',
+        name: 'deptID',
+        message: 'What is the department id?'
+    }
+    ]).then(({ title, salary, deptID }) => {
+        let newRole = new Role(title, deptID, salary);
+        console.log(newRole);
+
+        addRole(newRole);
+    })
+}
+
+function addRole(newRole) {
+    db.promise().query('INSERT INTO roles SET ?', newRole)
+    nextAction();
+};
+
+function inquireEmployee(){
+    console.clear();
+    console.log("Let's add a new employee to the database. Please answer a few questions.");
+
+    inquirer.prompt([{
+        type: 'input',
+        name: 'firstName',
+        message: 'What is their first name?'
+    },
+    {
+        type: 'input',
+        name: 'lastName',
+        message: 'What is their last name??'
+    },
+    {
+        type: 'input',
+        name: 'roleID',
+        message: 'What is their role id?'
+    },
+    {
+        type: 'input',
+        name: 'managerID',
+        message: 'What is their manager id?'
+    }
+    ]).then(({ firstName, lastName, roleID, managerID }) => {
+        let newEmployee = new Employee(firstName, lastName, roleID, managerID);
+        console.log(newEmployee);
+
+        addEmployee(newEmployee);
+    })
+}
+
+function addEmployee(newEmployee) {
+    db.promise().query('INSERT INTO employees SET ?', newEmployee)
+    nextAction();
+};
+
+function inquireUpdate() {
+    console.clear();
+    console.log("Let's update and employee role. Please answer the questions bellow.");
+
+    inquirer.prompt([{
+        type: 'input',
+        name: 'employeeID',
+        message: 'Which employee do you want to update? Please type their id.'
+    },
+    {
+        type: 'input',
+        name: 'newRole',
+        message: 'What is their new role? Please type the role id.'
+    }
+    ]).then(({ employeeID, newRole }) => {
+        let updateInfo = [newRole, employeeID];
+        console.log(updateInfo);
+
+        updateEmployee(updateInfo);
+    })
+}
+
+function updateEmployee(updateInfo) {
+    db.promise().query('UPDATE employees SET role_id=? WHERE id=?', updateInfo)
+    nextAction();
 };
 
 console.clear();
